@@ -1,0 +1,36 @@
+//---TESTBENCH-- 
+module tb; 
+    logic [3:0] in; 
+    logic [1:0] out; 
+    logic       valid; 
+ 
+    priority_enc dut (.*);   // fixed name + ASCII .* 
+ 
+    covergroup cg_enc; 
+        cp_in : coverpoint in { 
+            bins b0 = {1};   // 0001 
+            bins b1 = {2};   // 0010 
+            bins b2 = {4};   // 0100 
+            bins b3 = {8};   // 1000 
+            bins others = default; 
+        } 
+    endgroup 
+ 
+    cg_enc cg = new(); 
+ 
+    //   ONLY thing EPWave needs 
+    initial begin 
+        $dumpfile("wave.vcd"); 
+        $dumpvars(0, tb); 
+    end 
+ 
+    initial begin 
+        repeat (50) begin 
+in = $urandom_range(0, 15);  // fixed function name 
+#5; 
+cg.sample(); 
+end 
+$display("Coverage: %0.2f %%", cg.get_inst_coverage()); 
+$finish; 
+end 
+endmodule
